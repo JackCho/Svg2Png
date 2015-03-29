@@ -24,17 +24,19 @@ public class Converter {
 	 *            the density to output the PNG; determines scaling
 	 * @param destination
 	 *            the output destination
+	 * @param baseDensity
+	 * 			  the base density
 	 */
-	void transcode(SVGResource svgResource, Density density, File destination) {
+	void transcode(SVGResource svgResource, Density density, File destination, float baseDensity) {
 		if (!svgResource.canBeRead()) {
 			System.err.println("Cannot convert SVGResource "
 					+ svgResource.getFileName() + "; file cannot be parsed");
 			return;
 		}
-
-		int outWidth = Math.round(svgResource.getWidth() * density.multiplier);
-		int outHeight = Math
-				.round(svgResource.getHeight() * density.multiplier);
+		
+		float ratio = density.multiplier / baseDensity;
+		int outWidth = Math.round(svgResource.getWidth() * ratio);
+		int outHeight = Math.round(svgResource.getHeight() * ratio);
 		transcoder.addTranscodingHint(ImageTranscoder.KEY_WIDTH, new Float(
 				outWidth));
 		transcoder.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, new Float(
@@ -55,7 +57,6 @@ public class Converter {
 			destination.delete();
 			return;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
