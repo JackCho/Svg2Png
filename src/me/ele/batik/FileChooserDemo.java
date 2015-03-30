@@ -29,7 +29,7 @@ public class FileChooserDemo extends JPanel implements ActionListener {
 		pane.setSize(700, 700);
 		JPanel card = new JPanel();
 		card.setPreferredSize(new Dimension(1000, 50));
-	
+
 		fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
@@ -64,7 +64,7 @@ public class FileChooserDemo extends JPanel implements ActionListener {
 		card.add(spinner);
 		card.add(openButton);
 		card.add(startButton);
-		
+
 		logTextArea = new JTextArea();
 		logTextArea.setMargin(new Insets(15, 15, 15, 15));
 		logTextArea.setEditable(false);
@@ -91,10 +91,7 @@ public class FileChooserDemo extends JPanel implements ActionListener {
 				if (!folder.getAbsolutePath().endsWith(".svg")) {
 					append(folder.getAbsolutePath() + " is not a svg file"
 							+ newline);
-				} else {
-					svgFolder = folder.getParent();
 				}
-				return;
 			}
 
 			svgFolder = folder.getAbsolutePath();
@@ -105,7 +102,14 @@ public class FileChooserDemo extends JPanel implements ActionListener {
 						JOptionPane.WARNING_MESSAGE);
 				return;
 			}
+
+			Converter converter = new Converter();
 			File folder = new File(svgFolder);
+			if (!folder.isDirectory()) {
+				convertOneSvgFile(converter, folder);
+				return;
+			}
+			
 			File[] files = folder.listFiles();
 			if (files == null || files.length == 0) {
 				String string = " does not have a svg file";
@@ -113,11 +117,11 @@ public class FileChooserDemo extends JPanel implements ActionListener {
 				return;
 			}
 
-			Converter converter = new Converter();
 			for (File file : files) {
-				
+
 				if (!file.getName().endsWith(".svg")) {
-					append(file.getAbsolutePath() + " is not a svg file" + newline);
+					append(file.getAbsolutePath() + " is not a svg file"
+							+ newline);
 					continue;
 				}
 
@@ -143,7 +147,7 @@ public class FileChooserDemo extends JPanel implements ActionListener {
 		// Create and set up the window.
 		JFrame frame = new JFrame("svg批量转png");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		// frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 
 		// Add content to the window.
 		frame.add(new FileChooserDemo(frame.getContentPane()));
@@ -166,6 +170,10 @@ public class FileChooserDemo extends JPanel implements ActionListener {
 	}
 
 	private File getResourceDir(Density density) {
+		File folder = new File(svgFolder);
+		if (!folder.isDirectory()) {
+			svgFolder = folder.getParent();
+		}
 		File file = new File(svgFolder, "/drawable-"
 				+ density.name().toLowerCase());
 		if (!file.exists()) {
